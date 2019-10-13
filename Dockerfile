@@ -21,6 +21,8 @@ RUN \
   unzip xteve.zip && \
   mv xteve /usr/bin/xteve && \
   chmod 0775 /usr/bin/xteve && \
+  echo "**** allow vlc to run as root ****" && \
+  sed -i 's/geteuid/getppid/' /usr/bin/vlc && \
  echo "**** cleanup ****" && \
  rm -rf \
     /root/go/ \
