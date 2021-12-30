@@ -5,8 +5,10 @@ ARG VERSION
 LABEL build_version="RadPenguin version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 
 ENV TZ="America/Edmonton"
+ENV REPO=xteve-project/xTeVe
 
 RUN \
+ echo "**** Using latest release from ${LATEST_RELEASE_URL}" && \
  echo "**** install runtime packages ****" && \
   apk add --no-cache \
       ca-certificates \
@@ -15,7 +17,9 @@ RUN \
       tzdata \
       vlc \
       unzip && \
-  echo "**** build xteve ****" && \
+  echo "**** find latest release of xteve *****" && \
+  LATEST_RELEASE_URL=$( curl --silent https://api.github.com/repos/${REPO}/releases/latest | grep "tarball_url"  | sed -e 's/^.*: "//' -e 's/".*//' ) && \
+  echo "**** downloading ${LATEST_RELEASE_URL} ****" && \
   cd /tmp && \
   curl --location https://xteve.de/download/xteve_2_linux_amd64.zip -o xteve.zip && \
   unzip xteve.zip && \
