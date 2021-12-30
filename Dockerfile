@@ -4,30 +4,29 @@ ARG BUILD_DATE
 ARG VERSION
 LABEL build_version="RadPenguin version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LC_ALL C.UTF-8
 ENV TZ="America/Edmonton"
 ENV REPO=xteve-project/xTeVe
 
-RUN \
- echo "**** Using latest release from ${LATEST_RELEASE_URL}" && \
- echo "**** install runtime packages ****" && \
+RUN echo "**** install runtime packages ****" && \
   apk add --no-cache \
       ca-certificates \
       curl \
       ffmpeg \
       tzdata \
       vlc \
-      unzip && \
-  echo "**** find latest release of xteve *****" && \
-  LATEST_RELEASE_URL=$( curl --silent https://api.github.com/repos/${REPO}/releases/latest | grep "tarball_url"  | sed -e 's/^.*: "//' -e 's/".*//' ) && \
-  echo "**** downloading ${LATEST_RELEASE_URL} ****" && \
-  cd /tmp && \
-  curl --location https://xteve.de/download/xteve_2_linux_amd64.zip -o xteve.zip && \
-  unzip xteve.zip && \
-  mv xteve /usr/bin/xteve && \
-  chmod 0775 /usr/bin/xteve && \
-  echo "**** allow vlc to run as root ****" && \
-  sed -i 's/geteuid/getppid/' /usr/bin/vlc && \
- echo "**** cleanup ****" && \
+      unzip
+
+RUN echo "**** download xteve ****" && \
+  curl --location --silent "https://github.com/xteve-project/xTeVe-Downloads/blob/master/xteve_linux_amd64.tar.gz?raw=true" | tar zx --strip-components 1 -C /usr/bin/ && \
+  chmod 0775 /usr/bin/xteve
+
+RUN echo "**** allow vlc to run as root ****" && \
+  sed -i 's/geteuid/getppid/' /usr/bin/vlc
+
+RUN echo "**** cleanup ****" && \
  rm -rf \
     /root/go/ \
     /root/.cache/ \
